@@ -17,10 +17,18 @@ public class FileUtilTest {
 	
 	@Test
 	public void testClasses() {
-		String basePath = "/Users/chenli/Desktop/Playground/File/File/src/main/java";
-		String path = "/Users/chenli/Desktop/Playground/File/File/src/main/java/evolution";
+		String basePath = "/Users/chenli/Desktop/Playground/Git/File/File/src/main/java";
+		String path = "/Users/chenli/Desktop/Playground/Git/File/File/src/main/java/evolution";
 		List<Class<?>> classes = null;
 		classes = FileUtil.classes(path, basePath, Arrays.asList(RestController.class, RestController.class), classes);
+		System.out.println(classes);
+	}
+	
+	@Test
+	public void testClassesWithoutBasePAth() {
+		String path = "/Users/chenli/Desktop/Playground/Git/File/File/src/main/java/evolution";
+		List<Class<?>> classes = null;
+		classes = FileUtil.classes(path, Arrays.asList(RestController.class, RestController.class), classes);
 		System.out.println(classes);
 	}
 }

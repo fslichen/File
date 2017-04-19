@@ -43,6 +43,11 @@ public class FileUtil {
 		return "properties".equals(extension(path));
 	}
 	
+	@SuppressWarnings("rawtypes")
+	public static List<Class<?>> classes(String path, List<Class> annotationClasses, List<Class<?>> classes) {
+		return classes(path, path.substring(0, path.lastIndexOf("/")), annotationClasses, classes);
+	}
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static List<Class<?>> classes(String path, String basePath, List<Class> annotationClasses, List<Class<?>> classes) {
 		classes = classes == null ? new LinkedList<>() : classes;
