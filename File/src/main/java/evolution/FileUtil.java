@@ -1,12 +1,8 @@
 package evolution;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.junit.Test;
-import org.springframework.web.bind.annotation.RestController;
 
 public class FileUtil {
 	public static String path2PackageOrClassName(String path, String basePath) {
