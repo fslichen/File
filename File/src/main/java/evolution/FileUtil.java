@@ -1,14 +1,59 @@
 package evolution;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 public class FileUtil {
+	public static String extension(File file) {
+		String filename = file.getName();
+		return filename.substring(filename.lastIndexOf(".") + 1);
+	}
+	
+	public static Boolean isValidFile(String filePath) {
+		File file = new File(filePath);
+		if (!file.exists()) {
+			Str.println(filePath + " does not exist.");
+			return false;
+		} else if (file.isDirectory()) {
+			Str.println(filePath + " represents a folder.");
+			return false;
+		}
+		return true;
+	}
+	
+	public static void replace(String filePath, String oldWord, String newWord) {
+		if (!isValidFile(filePath)) {
+			return;
+		}
+		File file = new File(filePath);
+		try {
+			FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			File temporaryFile = File.createTempFile(file.getName(), extension(file));
+			FileWriter fileWriter = new FileWriter(temporaryFile);
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			String line = null;
+			while ((line = bufferedReader.readLine()) != null) {
+				line = line.replaceAll(oldWord, newWord);
+				bufferedWriter.write(line + "\n");
+			}
+			bufferedReader.close();
+			bufferedWriter.close();
+			copy(temporaryFile, file);// Overwrite the original file.
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void copy(String sourceFolderBasePath, 
 			String targetFolderBasePath) {
 		File sourceFolder = new File(sourceFolderBasePath);
