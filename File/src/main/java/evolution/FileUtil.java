@@ -1,10 +1,54 @@
 package evolution;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 public class FileUtil {
+	public static void copy(String sourceFolderBasePath, 
+			String targetFolderBasePath) {
+		copy(sourceFolderBasePath, sourceFolderBasePath,
+				targetFolderBasePath, targetFolderBasePath);
+	}
+	
+	public static void copy(String sourceFolderPath, String sourceFolderBasePath,
+			String targetFolderPath, String targetFolderBasePath) {
+		File sourceFolder = new File(sourceFolderPath);
+		String[] subSourceFileOrFolderRelativePaths = sourceFolder.list();
+		for (String subSourceFileOrFolderRelativePath : subSourceFileOrFolderRelativePaths) {
+			String subSourceFileOrFolderPath = sourceFolderPath + "/" + subSourceFileOrFolderRelativePath;
+			File subSourceFileOrFolder = new File(subSourceFileOrFolderPath);
+			String subTargetFileOrFolderPath = targetFolderBasePath + "/" + Str.minus(subSourceFileOrFolderPath, sourceFolderBasePath);
+			if (subSourceFileOrFolder.isDirectory()) {
+				new File(subTargetFileOrFolderPath).mkdir();
+				copy(subSourceFileOrFolderPath, sourceFolderBasePath,
+						subTargetFileOrFolderPath, targetFolderBasePath);
+			} else if (subSourceFileOrFolder.isFile()) {
+				copy(new File(subSourceFileOrFolderPath), new File(subTargetFileOrFolderPath));
+			}
+		}
+	}
+	
+	public static void copy(File file0, File file1) {
+		try {
+			InputStream in = new FileInputStream(file0);
+			OutputStream out = new FileOutputStream(file1);
+			byte[] buffer = new byte[1024];
+			int length = -1;
+			while ((length = in.read(buffer)) != -1) {
+				out.write(buffer, 0, length);
+			}
+			in.close();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static String path2PackageOrClassName(String path, String basePath) {
 		path = path.substring(basePath.length() + 1, path.length()).replace("/", ".");
 		int length = path.length();
