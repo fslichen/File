@@ -11,6 +11,22 @@ import java.util.List;
 public class FileUtil {
 	public static void copy(String sourceFolderBasePath, 
 			String targetFolderBasePath) {
+		File sourceFolder = new File(sourceFolderBasePath);
+		if (!sourceFolder.exists()) {
+			Str.println("Source path " + sourceFolderBasePath + " does not exist.");
+			return;
+		} else if (sourceFolder.isFile()) {
+			Str.println(sourceFolderBasePath + " is not a folder.");
+			return;
+		}
+		File targetFolder = new File(targetFolderBasePath);
+		if (!targetFolder.exists()) {
+			Str.println("Target path " + targetFolderBasePath + " does not exist.");
+			return;
+		} else if (targetFolder.isFile()) {
+			Str.println(targetFolderBasePath + " is not a folder.");
+			return;
+		}
 		copy(sourceFolderBasePath, sourceFolderBasePath,
 				targetFolderBasePath, targetFolderBasePath);
 	}
