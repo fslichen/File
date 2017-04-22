@@ -13,9 +13,31 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FileUtil {
+	public static String createFolders(String... folderPaths) {
+		StringBuilder folderPath = new StringBuilder(folderPaths[0]);
+		for (int i = 1; i < folderPaths.length; i++) {
+			folderPath.append("/").append(folderPaths[i].replace(".", "/"));
+		}
+		File file = new File(folderPath.toString());
+		file.mkdirs();
+		return folderPath.toString();
+	}
+	
 	public static String extension(File file) {
 		String filename = file.getName();
 		return filename.substring(filename.lastIndexOf(".") + 1);
+	}
+
+	public static Boolean isValidFolder(String folderPath) {
+		File file = new File(folderPath);
+		if (!file.exists()) {
+			Str.println(folderPath + " does not exist.");
+			return false;
+		} else if (file.isFile()) {
+			Str.println(folderPath + " should be a folder rather than a file.");
+			return false;
+		}
+		return true;
 	}
 	
 	public static Boolean isValidFile(String filePath) {
@@ -24,7 +46,7 @@ public class FileUtil {
 			Str.println(filePath + " does not exist.");
 			return false;
 		} else if (file.isDirectory()) {
-			Str.println(filePath + " represents a folder.");
+			Str.println(filePath + " should be a file rather than a folder.");
 			return false;
 		}
 		return true;
@@ -43,7 +65,7 @@ public class FileUtil {
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 			String line = null;
 			while ((line = bufferedReader.readLine()) != null) {
-				line = line.replaceAll(oldWord, newWord);
+				line = line.replace(oldWord, newWord);
 				bufferedWriter.write(line + "\n");
 			}
 			bufferedReader.close();
@@ -55,29 +77,16 @@ public class FileUtil {
 	}
 	
 	public static void copy(String sourceFolderBasePath, 
-			String targetFolderBasePath) {
-		File sourceFolder = new File(sourceFolderBasePath);
-		if (!sourceFolder.exists()) {
-			Str.println("Source path " + sourceFolderBasePath + " does not exist.");
-			return;
-		} else if (sourceFolder.isFile()) {
-			Str.println(sourceFolderBasePath + " is not a folder.");
-			return;
-		}
-		File targetFolder = new File(targetFolderBasePath);
-		if (!targetFolder.exists()) {
-			Str.println("Target path " + targetFolderBasePath + " does not exist.");
-			return;
-		} else if (targetFolder.isFile()) {
-			Str.println(targetFolderBasePath + " is not a folder.");
+			String targetFolderBasePath, String oldWord, String newWord) {
+		if (!isValidFolder(sourceFolderBasePath) || !isValidFolder(targetFolderBasePath)) {
 			return;
 		}
 		copy(sourceFolderBasePath, sourceFolderBasePath,
-				targetFolderBasePath, targetFolderBasePath);
+				targetFolderBasePath, targetFolderBasePath, oldWord, newWord);
 	}
 	
 	public static void copy(String sourceFolderPath, String sourceFolderBasePath,
-			String targetFolderPath, String targetFolderBasePath) {
+			String targetFolderPath, String targetFolderBasePath, String oldWord, String newWord) {
 		File sourceFolder = new File(sourceFolderPath);
 		String[] subSourceFileOrFolderRelativePaths = sourceFolder.list();
 		for (String subSourceFileOrFolderRelativePath : subSourceFileOrFolderRelativePaths) {
@@ -87,9 +96,12 @@ public class FileUtil {
 			if (subSourceFileOrFolder.isDirectory()) {
 				new File(subTargetFileOrFolderPath).mkdir();
 				copy(subSourceFileOrFolderPath, sourceFolderBasePath,
-						subTargetFileOrFolderPath, targetFolderBasePath);
+						subTargetFileOrFolderPath, targetFolderBasePath, oldWord, newWord);
 			} else if (subSourceFileOrFolder.isFile()) {
 				copy(new File(subSourceFileOrFolderPath), new File(subTargetFileOrFolderPath));
+				if (oldWord != null && newWord != null) {
+					replace(subTargetFileOrFolderPath, oldWord, newWord);
+				}
 			}
 		}
 	}
