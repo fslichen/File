@@ -1,5 +1,6 @@
 package evolution;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,6 +8,11 @@ import org.junit.Test;
 import org.springframework.web.bind.annotation.RestController;
 
 public class FileUtilTest {
+	@Test
+	public void testAddLineBelowKeyword() {
+		FileUtil.addLineBelowKeyword(new File("/Users/chenli/Desktop/anyFile.txt"), "@Test", "Hello World");
+	}
+	
 	@Test
 	public void testPath2PackageName() {
 		String basePath = "/Users/chenli/Desktop/Playground/File/File/src/main/java";
@@ -21,14 +27,6 @@ public class FileUtilTest {
 		String path = "/Users/chenli/Desktop/Playground/Git/File/File/src/main/java/evolution";
 		List<Class<?>> classes = null;
 		classes = FileUtil.classes(path, basePath, Arrays.asList(RestController.class, RestController.class), classes);
-		System.out.println(classes);
-	}
-	
-	@Test
-	public void testClassesWithoutBasePAth() {
-		String path = "/Users/chenli/Desktop/Playground/Git/File/File/src/main/java/evolution";
-		List<Class<?>> classes = null;
-		classes = FileUtil.classes(path, Arrays.asList(RestController.class, RestController.class), classes);
 		System.out.println(classes);
 	}
 }

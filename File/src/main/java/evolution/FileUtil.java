@@ -9,10 +9,92 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class FileUtil {
+	public static void addLineBelowKeyword(File file, String keyword, String insertedLine) {
+		try {
+			FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			File updatedFile = File.createTempFile(file.getName(), extension(file));
+			FileWriter fileWriter = new FileWriter(updatedFile);
+			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+			String line = null;
+			while ((line = bufferedReader.readLine()) != null) {
+				bufferedWriter.write(line + "\n");
+				if (line.contains(keyword)) {
+					bufferedWriter.write(insertedLine + "\n");
+				} 
+			}
+			bufferedReader.close();
+			bufferedWriter.close();
+			copy(updatedFile, file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static List<Map<Byte, Byte>> encryptionAndDecryptionMaps() {
+		Map<Byte, Byte> encryptionMap = new HashMap<>();
+		Map<Byte, Byte> decryptionMap = new HashMap<>();
+		int stepSize = 37;// Set the step size as a prime number;
+		for (int i = -128; i < 128; i++) {
+			int j = i + stepSize;
+			if (j >= 128) {
+				j -= 256;
+			}
+			encryptionMap.put(new Byte(i + ""), new Byte(j + ""));
+			decryptionMap.put(new Byte(j + ""), new Byte(i + ""));
+		}
+		List<Map<Byte, Byte>> encryptionAndDecryptionMaps = new LinkedList<>();
+		encryptionAndDecryptionMaps.add(encryptionMap);
+		encryptionAndDecryptionMaps.add(decryptionMap);
+		return encryptionAndDecryptionMaps;
+	}
+	
+	public static void decrypt(String filePath, String decryptedFilePath) {
+		Map<Byte, Byte> decryptionMap = encryptionAndDecryptionMaps().get(1);
+		try {
+			InputStream in = new FileInputStream(new File(filePath));
+			OutputStream out = new FileOutputStream(new File(decryptedFilePath));
+			byte[] buffer = new byte[1024];
+			int length = -1;
+			while ((length = in.read(buffer)) != -1) {
+				for (int i = 0; i < buffer.length; i++) {
+					buffer[i] = decryptionMap.get(buffer[i]);
+				}
+				out.write(buffer, 0, length);
+			}
+			in.close();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void encrypt(String filePath, String encryptedFilePath) {
+		Map<Byte, Byte> encryptionMap = encryptionAndDecryptionMaps().get(0);
+		try {
+			InputStream in = new FileInputStream(new File(filePath));
+			OutputStream out = new FileOutputStream(new File(encryptedFilePath));
+			byte[] buffer = new byte[1024];
+			int length = -1;
+			while ((length = in.read(buffer)) != -1) {
+				for (int i = 0; i < buffer.length; i++) {
+					buffer[i] = encryptionMap.get(buffer[i]);
+				}
+				out.write(buffer, 0, length);
+			}
+			in.close();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static String createFolders(String... folderPaths) {
 		StringBuilder folderPath = new StringBuilder(folderPaths[0]);
 		for (int i = 1; i < folderPaths.length; i++) {
@@ -154,11 +236,6 @@ public class FileUtil {
 	
 	public static Boolean isProperties(String path) {
 		return "properties".equals(extension(path));
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public static List<Class<?>> classes(String path, List<Class> annotationClasses, List<Class<?>> classes) {
-		return classes(path, path.substring(0, path.lastIndexOf("/")), annotationClasses, classes);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
