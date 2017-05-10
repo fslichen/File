@@ -29,4 +29,9 @@ public class FileUtilTest {
 		classes = FileUtil.classes(path, basePath, Arrays.asList(RestController.class, RestController.class), classes);
 		System.out.println(classes);
 	}
+	
+	@Test
+	public void encrypt() {
+		FileUtil.encrypt("/Users/chenli/Desktop/Swagger_Creator.zip", "/Users/chenli/Desktop/Swagger_Creator_Encoded.zip");
+	}
 }
