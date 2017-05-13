@@ -15,6 +15,21 @@ import java.util.List;
 import java.util.Map;
 
 public class FileUtil {
+	public static List<File> projectFiles(String packageName, boolean recursive) {
+		String projectPath = System.getProperty("user.dir");
+		String packagePath = projectPath + "/" + packageName;
+		System.out.println("Project File Path = " + projectPath);
+		List<File> files = new LinkedList<>();
+		for (File file : new File(packagePath).listFiles()) {
+			if (file.isFile()) {
+				files.add(file);
+			} else if (file.isDirectory() && recursive) {
+				files.addAll(projectFiles(packageName + "/" + file.getName(), recursive));
+			}
+		}
+		return files; 
+	}
+	
 	public static void addLineBelowKeyword(File file, String keyword, String insertedLine) {
 		try {
 			FileReader fileReader = new FileReader(file);
