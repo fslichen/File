@@ -15,16 +15,30 @@ import java.util.List;
 import java.util.Map;
 
 public class FileUtil {
-	public static List<File> projectFiles(String packageName, boolean recursive) {
+	public static List<Class<?>> projectClasses(String prefix, String packageName, boolean recursive) {
+		List<File> files = projectFiles(prefix, packageName, recursive);
+		List<Class<?>> classes = new LinkedList<>();
 		String projectPath = System.getProperty("user.dir");
-		String packagePath = projectPath + "/" + packageName;
-		System.out.println("Project File Path = " + projectPath);
+		for (File file : files) {
+			String path = file.getAbsolutePath().substring(projectPath.length() + prefix.length() + 2);
+			path = path.substring(0, path.length() - 5).replace("/", ".");
+			System.out.println(path);
+			try {
+				classes.add(Class.forName(path));
+			} catch (ClassNotFoundException e) {}
+		}
+		return classes;
+	}
+	
+	public static List<File> projectFiles(String prefix, String packageName, boolean recursive) {
+		String projectPath = System.getProperty("user.dir");
+		String packagePath = projectPath + "/" + prefix + "/" + packageName;
 		List<File> files = new LinkedList<>();
 		for (File file : new File(packagePath).listFiles()) {
 			if (file.isFile()) {
 				files.add(file);
 			} else if (file.isDirectory() && recursive) {
-				files.addAll(projectFiles(packageName + "/" + file.getName(), recursive));
+				files.addAll(projectFiles(prefix, packageName + "/" + file.getName(), recursive));
 			}
 		}
 		return files; 
