@@ -15,14 +15,41 @@ import java.util.List;
 import java.util.Map;
 
 public class FileUtil {
+	private static final String SRC_MAIN_JAVA = "src/main/java";
+	private static final String SRC_MAIN_RESOURCES = "src/main/resources";
+	private static final String SRC_TEST_JAVA = "src/test/java";
+	private static final String SRC_TEST_RESOURCES = "src/test/resources";
+	
+	public static String getSrcMainJava() {
+		return SRC_MAIN_JAVA;
+	}
+
+	public static String getSrcMainResources() {
+		return SRC_MAIN_RESOURCES;
+	}
+
+	public static String getSrcTestJava() {
+		return SRC_TEST_JAVA;
+	}
+
+	public static String getSrcTestResources() {
+		return SRC_TEST_RESOURCES;
+	}
+	
+	public static String packagePath(String prefix, String packageName) {
+		return projectRootPath() + "/" + prefix + "/" + packageName.replace(".", "/");
+	}
+	
+	public static String projectRootPath() {
+		return System.getProperty("user.dir").replace("\\", "/");
+	}
+
 	public static List<Class<?>> projectClasses(String prefix, String packageName, boolean recursive) {
 		List<File> files = projectFiles(prefix, packageName, recursive);
 		List<Class<?>> classes = new LinkedList<>();
-		String projectPath = System.getProperty("user.dir");
 		for (File file : files) {
-			String path = file.getAbsolutePath().substring(projectPath.length() + prefix.length() + 2);
+			String path = file.getAbsolutePath().substring(projectRootPath().length() + prefix.length() + 2);
 			path = path.substring(0, path.length() - 5).replace("/", ".");
-			System.out.println(path);
 			try {
 				classes.add(Class.forName(path));
 			} catch (ClassNotFoundException e) {}
@@ -31,8 +58,7 @@ public class FileUtil {
 	}
 	
 	public static List<File> projectFiles(String prefix, String packageName, boolean recursive) {
-		String projectPath = System.getProperty("user.dir");
-		String packagePath = projectPath + "/" + prefix + "/" + packageName;
+		String packagePath = packagePath(prefix, packageName);
 		List<File> files = new LinkedList<>();
 		for (File file : new File(packagePath).listFiles()) {
 			if (file.isFile()) {

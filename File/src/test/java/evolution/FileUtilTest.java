@@ -9,6 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 public class FileUtilTest {
 	@Test
+	public void testProjectClasses() {
+		List<Class<?>> classes = FileUtil.projectClasses(FileUtil.getSrcMainJava(), "evolution.controller", false);
+		System.out.println(classes);
+	}
+	
+	@Test
 	public void testAddLineBelowKeyword() {
 		FileUtil.addLineBelowKeyword(new File("/Users/chenli/Desktop/anyFile.txt"), "@Test", "Hello World");
 	}
